@@ -23,7 +23,7 @@ public class LoggerServer implements MonitorService, Runnable {
 
     private int pollFrequency = DEFAULT_POLL_FREQUENCY;
     private ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
-    private final List<Map.Entry<String, String>> metrics = new LinkedList<>();
+    private final List<MetricsEntry> metrics = new LinkedList<>();
 
     @Override
     public void configure(final Context context) {
@@ -47,12 +47,16 @@ public class LoggerServer implements MonitorService, Runnable {
         if (metrics.isEmpty()) {
             LOGGER.info("metrics: {}", metricsMap);
         } else {
-            for (Map.Entry<String, String> entry : metrics) {
-                final Map<String, String> attrs = metricsMap.get(entry.getKey());
+            for (MetricsEntry entry : metrics) {
+                final Map<String, String> attrs = metricsMap.get(entry.key);
                 if (attrs != null) {
-                    final String attr = attrs.get(entry.getValue());
-                    if (attr != null) {
-                        LOGGER.info("metrics: {}.{} = {}", entry.getKey(), entry.getValue(), attr);
+                    if (entry.blank) {
+                        LOGGER.info("metrics: {} = {}", entry.key, attrs);
+                    } else {
+                        final String attr = attrs.get(entry.value);
+                        if (attr != null) {
+                            LOGGER.info("metrics: {}:{} = {}", entry.key, entry.value, attr);
+                        }
                     }
                 }
             }
@@ -85,28 +89,24 @@ public class LoggerServer implements MonitorService, Runnable {
         LOGGER.info("monitor stopped.");
     }
 
-    public static final class MetricsEntry implements Map.Entry<String, String> {
+    private static final class MetricsEntry {
         private final String key;
         private final String value;
+        private final boolean blank;
 
         private MetricsEntry(final String key, final String value) {
             this.key = key;
             this.value = value;
+            this.blank = StringUtils.isBlank(value);
         }
 
         @Override
-        public String getKey() {
-            return key;
-        }
-
-        @Override
-        public String getValue() {
-            return value;
-        }
-
-        @Override
-        public String setValue(final String newValue) {
-            throw new UnsupportedOperationException();
+        public String toString() {
+            if (blank) {
+                return key;
+            } else {
+                return key + ':' + value;
+            }
         }
     }
 }
