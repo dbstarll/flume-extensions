@@ -8,7 +8,7 @@
   </parent>
   <groupId>io.github.dbstarll.flume</groupId>
   <artifactId>flume-extensions</artifactId>
-  <version>1.0.0-SNAPSHOT</version>
+  <version>1.0.0</version>
 
   <description>flume-extensions</description>
   <url>https://github.com/dbstarll/flume-extensions</url>
@@ -17,7 +17,7 @@
     <connection>scm:git:${project.git.git.root}</connection>
     <developerConnection>scm:git:${project.git.web.root}</developerConnection>
     <url>${project.git.web.master}</url>
-    <tag>HEAD</tag>
+    <tag>v1.0.0</tag>
   </scm>
 
   <properties>
